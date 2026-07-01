@@ -31,7 +31,7 @@ Parser::Parser(char *buffer, const int length)
     : Parser(buffer, buffer + length - 1) {}
 Parser::~Parser() { *reinterpret_cast<int32_t *>(end - 4) = data; }
 const InputType Parser::Recognise() {
-  return start[1] == 't' ? InputType::Response : InputType::Request;
+  return start[1] == 'T' ? InputType::Response : InputType::Request;
 }
 const int Parser::ParseRequest(MethodType *const method, const char **uri,
                                int *const uriLength, HttpVersion *const version,

@@ -18,7 +18,7 @@ TEST_CASE("Usual request with wrapper") {
   int32_t status = StatusCode::Accepted;
   Parser parser(buffer, end);
 
-  CHECK(parser.Recognise() == InputType::Request);
+  CHECK(parser.Recognise() == InputType::Response);
   CHECK(parser.ParseResponse(&version, &status, names, nameLengths, values,
                              valueLengths, 1) == 1);
   CHECK(version == HttpVersion::v1);
