@@ -1,3 +1,5 @@
+[![Tests](https://github.com/adkostatt/Http/actions/workflows/cmake-single-platform.yml/badge.svg)](https://github.com/adkostatt/Http/actions/workflows/cmake-single-platform.yml)
+
 Библиотека позволяет примитивно читать и создавать HTTP сообщения.
 
 Функции в <Http.hpp> небезопасны и могут привести к UB, если пренебречь предупреждениям в комментариях.
