@@ -4,4 +4,4 @@ file(GLOB_RECURSE LibSource CONFIGURE_DEPENDS
 )
 
 add_library(Http ${LibSource})
-target_include_directories(Http PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(Http PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)

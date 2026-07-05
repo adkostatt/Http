@@ -23,13 +23,9 @@ const int Parser::ParseHeaders(const char **names, int *nameLengths,
   }
   return headers;
 }
-Parser::Parser(char *start, char *end)
-    : start(start), end(end), data(*(reinterpret_cast<int32_t *>(end - 4))) {
-  *reinterpret_cast<int32_t *>(end - 4) = Delimiters;
-}
+Parser::Parser(char *start, char *end) : start(start), end(end) {}
 Parser::Parser(char *buffer, const int length)
     : Parser(buffer, buffer + length - 1) {}
-Parser::~Parser() { *reinterpret_cast<int32_t *>(end - 4) = data; }
 const InputType Parser::Recognise() {
   return start[1] == 'T' ? InputType::Response : InputType::Request;
 }
@@ -38,16 +34,30 @@ const int Parser::ParseRequest(MethodType *const method, const char **uri,
                                const char **names, int *nameLengths,
                                const char **values, int *valueLengths,
                                const int headersLimit) {
+  if (end - start < 4)
+    return -1;
+  const int32_t data = *reinterpret_cast<int32_t *>(end - 4);
+  *reinterpret_cast<int32_t *>(end - 4) = Delimiters;
   start = const_cast<char *>(
       ParseRequestStart(start, end, method, uri, uriLength, version));
-  return ParseHeaders(names, nameLengths, values, valueLengths, headersLimit);
+  int result =
+      ParseHeaders(names, nameLengths, values, valueLengths, headersLimit);
+  *reinterpret_cast<int32_t *>(end - 4) = data;
+  return result;
 }
 const int Parser::ParseResponse(HttpVersion *const version, int *const status,
                                 const char **names, int *nameLengths,
                                 const char **values, int *valueLengths,
                                 const int headersLimit) {
+  if (end - start < 4)
+    return -1;
+  const int32_t data = *reinterpret_cast<int32_t *>(end - 4);
+  *reinterpret_cast<int32_t *>(end - 4) = Delimiters;
   start = const_cast<char *>(ParseResponseStart(start, end, version, status));
-  return ParseHeaders(names, nameLengths, values, valueLengths, headersLimit);
+  int result =
+      ParseHeaders(names, nameLengths, values, valueLengths, headersLimit);
+  *reinterpret_cast<int32_t *>(end - 4) = data;
+  return result;
 }
 char *Parser::GetStart() { return start; }
 

@@ -9,7 +9,6 @@ class Parser {
 private:
   static constexpr int32_t Delimiters = StatusCode::StatusCodeGen("\r \r:");
   char *start, *end;
-  const int32_t data;
   const int ParseHeaders(const char **names, int *nameLengths,
                          const char **values, int *valueLengths,
                          const int headersLimit);
@@ -17,7 +16,6 @@ private:
 public:
   Parser(char *start, char *end);
   Parser(char *buffer, const int length);
-  ~Parser();
   const InputType Recognise();
   const int ParseRequest(MethodType *const method, const char **uri,
                          int *const uriLength, HttpVersion *const version,
