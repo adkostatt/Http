@@ -2,6 +2,7 @@
 #include <array>
 #include <bit>
 #include <cstdint>
+#include <cstring>
 namespace adkostatt {
 namespace Http {
 namespace StatusCode {
@@ -58,6 +59,9 @@ enum class HttpVersion {
   v3
 };
 
+inline const char *SkipHeaders(const char *start, const char *end) {
+  return static_cast<const char *>(memmem(start, start - end, "\r\n\r\n", 4));
+}
 // Array at the start must contain ':', ' ' and '\r' Or UB is possible
 const char *ParseHeader(const char *start, const char *end, const char **name,
                         int *const nameLength, const char **value,
@@ -78,7 +82,12 @@ char *GenerateResponseStart(char *start, const HttpVersion version,
                             const int32_t status);
 char *GenerateHeader(char *start, const char *name, const int nameLength,
                      const char *value, const int valueLength);
+
 // Just writes CRLF
-char *GenerateEnd(char *start);
+inline char *GenerateEnd(char *start) {
+  constexpr int16_t CRLF = std::bit_cast<int16_t>(std::array{'\r', '\n'});
+  *reinterpret_cast<int16_t *>(start) = CRLF;
+  return start + 2;
+}
 } // namespace Http
 } // namespace adkostatt

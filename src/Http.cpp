@@ -2,6 +2,7 @@
 #include <cstring>
 
 constexpr int16_t CRLF = std::bit_cast<int16_t>(std::array{'\r', '\n'});
+constexpr int16_t COLON = std::bit_cast<int16_t>(std::array{':', ' '});
 namespace adkostatt {
 namespace Http {
 const char *ParseHeader(const char *start, const char *end, const char **name,
@@ -15,23 +16,15 @@ const char *ParseHeader(const char *start, const char *end, const char **name,
   *name = start;
   const char *nameStart = start;
   ++start;
-  while (*start != ':')
-    ++start;
-  if (start >= end)
-    return nullptr;
+  start = static_cast<const char *>(std::memchr(start, ':', end - start));
   *nameLength = start - nameStart;
-  ++start;
-  while (*start == ' ')
-    ++start;
-  if (start >= end)
-    return nullptr;
+  start += 2;
   *value = start;
   const char *valueStart = start;
   ++start;
-  while (*start != '\r')
-    ++start;
+  start = static_cast<const char *>(std::memchr(start, '\r', end - start));
   *valueLength = start - valueStart;
-  return (start < end) ? start : nullptr;
+  return start;
 }
 const char *ParseRequestStart(const char *start, const char *end,
                               MethodType *const method, const char **uri,
@@ -83,10 +76,7 @@ const char *ParseRequestStart(const char *start, const char *end,
   }
   *uri = start;
   const char *uriStart = start;
-  while (*start != ' ')
-    ++start;
-  if (start >= end)
-    return nullptr;
+  start = static_cast<const char *>(std::memchr(start, ' ', end - start));
   *uriLength = start - uriStart;
   if (end - start < 10)
     return nullptr;
@@ -105,10 +95,9 @@ const char *ParseResponseStart(const char *start, const char *end,
   *version = hVersion;
   start += 3 - (static_cast<int>(hVersion) & 2);
   *statusCode = *reinterpret_cast<const int32_t *>(start);
-  start += 5;
-  while (*start != '\r')
-    ++start;
-  return (start < end) ? start : nullptr;
+  start += 4;
+  start = static_cast<const char *>(std::memchr(start, '\r', end - start));
+  return start;
 }
 
 char *GenerateRequestStart(char *start, const MethodType method,
@@ -176,14 +165,9 @@ char *GenerateHeader(char *start, const char *name, const int nameLength,
                      const char *value, const int valueLength) {
   std::memcpy(start, name, nameLength);
   start += nameLength;
-  *start = ':';
-  std::memcpy(start + 1, value, valueLength);
-  start += valueLength + 1;
-  *reinterpret_cast<int16_t *>(start) = CRLF;
-  return start + 2;
-}
-
-char *GenerateEnd(char *start) {
+  *reinterpret_cast<int16_t *>(start) = COLON;
+  std::memcpy(start + 2, value, valueLength);
+  start += valueLength + 2;
   *reinterpret_cast<int16_t *>(start) = CRLF;
   return start + 2;
 }
