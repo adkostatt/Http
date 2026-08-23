@@ -1,4 +1,4 @@
-#include <Http.hpp>
+#include <adkostatt/Http.hpp>
 #include <cstring>
 
 constexpr int16_t CRLF = std::bit_cast<int16_t>(std::array{'\r', '\n'});
@@ -8,10 +8,10 @@ namespace Http {
 const char *ParseHeader(const char *start, const char *end, const char **name,
                         int *const nameLength, const char **value,
                         int *const valueLength) {
-  if (end - start < 3)
+  if (end - start < 3) [[unlikely]]
     return nullptr;
   start += 2;
-  if (*start == '\r')
+  if (*start == '\r') [[unlikely]]
     return start + 1;
   *name = start;
   const char *nameStart = start;
@@ -30,10 +30,10 @@ const char *ParseRequestStart(const char *start, const char *end,
                               MethodType *const method, const char **uri,
                               int *const uriLength,
                               HttpVersion *const version) {
-  if (end - start < 16)
+  if (end - start < 16) [[unlikely]]
     return nullptr;
   switch (*start) {
-  case 'G':
+  [[likely]] case 'G':
     *method = MethodType::Get;
     start += 4;
     break;
@@ -41,13 +41,13 @@ const char *ParseRequestStart(const char *start, const char *end,
     *method = MethodType::Options;
     start += 8;
     break;
-  case 'H':
+  [[likely]] case 'H':
     *method = MethodType::Head;
     start += 5;
     break;
-  case 'P':
+  [[likely]] case 'P':
     switch (start[1]) {
-    case 'O':
+    [[likely]] case 'O':
       *method = MethodType::Post;
       start += 5;
       break;
@@ -78,7 +78,7 @@ const char *ParseRequestStart(const char *start, const char *end,
   const char *uriStart = start;
   start = static_cast<const char *>(std::memchr(start, ' ', end - start));
   *uriLength = start - uriStart;
-  if (end - start < 10)
+  if (end - start < 10) [[unlikely]]
     return nullptr;
   start += 6;
   HttpVersion hVersion = static_cast<HttpVersion>(*start);
@@ -88,7 +88,7 @@ const char *ParseRequestStart(const char *start, const char *end,
 const char *ParseResponseStart(const char *start, const char *end,
                                HttpVersion *const version,
                                int32_t *const statusCode) {
-  if (end - start < 14)
+  if (end - start < 14) [[unlikely]]
     return nullptr;
   start += 5;
   HttpVersion hVersion = static_cast<HttpVersion>(*start);
@@ -104,15 +104,15 @@ char *GenerateRequestStart(char *start, const MethodType method,
                            const char *uri, const int uriLength,
                            const HttpVersion version) {
   switch (method) {
-  case MethodType::Get:
+  [[likely]] case MethodType::Get:
     std::memcpy(start, "GET ", 4);
     start += 4;
     break;
-  case MethodType::Post:
+  [[likely]] case MethodType::Post:
     std::memcpy(start, "POST ", 5);
     start += 5;
     break;
-  case MethodType::Head:
+  [[likely]] case MethodType::Head:
     std::memcpy(start, "HEAD ", 5);
     start += 5;
     break;

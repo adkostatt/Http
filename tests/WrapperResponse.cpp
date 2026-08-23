@@ -1,5 +1,4 @@
-#include <Http.hpp>
-#include <HttpWrapper.hpp>
+#include <adkostatt/HttpWrapper.hpp>
 #include <doctest/doctest.h>
 #include <string_view>
 using namespace adkostatt::Http;
