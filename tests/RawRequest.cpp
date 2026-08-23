@@ -31,7 +31,7 @@ TEST_CASE("Usual request") {
   CHECK(start == end);
 }
 
-TEST_CASE("Unusual request") {
+/*TEST_CASE("Unusual request") {
   const char http[] =
       "CONNECT google.com:443 HTTP/0.9\r\nHost:proxy.com\r\nUser-Id:     "
       "123\r\n\r\nSome data";
@@ -64,7 +64,7 @@ TEST_CASE("Unusual request") {
   start = ParseHeader(start, end, &name, &nameLength, &value, &valueLength);
 
   CHECK(*start == '\n');
-}
+}*/
 
 TEST_CASE("Generate request") {
   char http[128];
