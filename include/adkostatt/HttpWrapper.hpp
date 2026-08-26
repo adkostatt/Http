@@ -10,10 +10,13 @@ struct Request {
   int uriLength;
   MethodType method;
   HttpVersion version;
+  Request(const char *uri, int uriLength, MethodType method,
+          HttpVersion version)
+      : uri(uri), uriLength(uriLength), method(method), version(version) {}
   Request(std::string_view uri, MethodType method, HttpVersion version)
-      : uri(uri.data()), uriLength(static_cast<int>(uri.length())),
-        method(method), version(version) {}
-  std::string_view Uri() {
+      : Request(uri.data(), static_cast<int>(uri.length()), method, version) {}
+  Request() = default;
+  inline std::string_view Uri() const {
     return std::string_view{uri, static_cast<size_t>(uriLength)};
   }
 };
@@ -26,14 +29,17 @@ struct Header {
   const char *value;
   int nameLength;
   int valueLength;
+  Header(const char *name, const char *value, int nameLength, int valueLength)
+      : name(name), value(value), nameLength(nameLength),
+        valueLength(valueLength) {}
   Header(std::string_view name, std::string_view value)
-      : name(name.data()), value(value.data()),
-        nameLength(static_cast<int>(name.length())),
-        valueLength(static_cast<int>(value.length())) {}
-  std::string_view Name() {
+      : Header(name.data(), value.data(), static_cast<int>(name.length()),
+               static_cast<int>(value.length())) {}
+  Header() = default;
+  inline std::string_view Name() const {
     return std::string_view{name, static_cast<size_t>(nameLength)};
   }
-  std::string_view Value() {
+  inline std::string_view Value() const {
     return std::string_view{value, static_cast<size_t>(valueLength)};
   }
 };
