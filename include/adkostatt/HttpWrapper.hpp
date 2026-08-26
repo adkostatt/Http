@@ -1,5 +1,6 @@
 #pragma once
 #include <adkostatt/Http.hpp>
+#include <string_view>
 
 namespace adkostatt {
 namespace Http {
@@ -9,6 +10,12 @@ struct Request {
   int uriLength;
   MethodType method;
   HttpVersion version;
+  Request(std::string_view uri, MethodType method, HttpVersion version)
+      : uri(uri.data()), uriLength(static_cast<int>(uri.length())),
+        method(method), version(version) {}
+  std::string_view Uri() {
+    return std::string_view{uri, static_cast<size_t>(uriLength)};
+  }
 };
 struct Response {
   int status;
@@ -19,6 +26,16 @@ struct Header {
   const char *value;
   int nameLength;
   int valueLength;
+  Header(std::string_view name, std::string_view value)
+      : name(name.data()), value(value.data()),
+        nameLength(static_cast<int>(name.length())),
+        valueLength(static_cast<int>(value.length())) {}
+  std::string_view Name() {
+    return std::string_view{name, static_cast<size_t>(nameLength)};
+  }
+  std::string_view Value() {
+    return std::string_view{value, static_cast<size_t>(valueLength)};
+  }
 };
 class Parser {
 private:
