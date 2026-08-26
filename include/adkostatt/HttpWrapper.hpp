@@ -13,8 +13,10 @@ struct Request {
   Request(const char *uri, int uriLength, MethodType method,
           HttpVersion version)
       : uri(uri), uriLength(uriLength), method(method), version(version) {}
+  // std::string_view must be null terminated
   Request(std::string_view uri, MethodType method, HttpVersion version)
-      : Request(uri.data(), static_cast<int>(uri.length()), method, version) {}
+      : Request(uri.data(), static_cast<int>(uri.length()) - 1, method,
+                version) {}
   Request() = default;
   inline std::string_view Uri() const {
     return std::string_view{uri, static_cast<size_t>(uriLength)};
@@ -32,9 +34,10 @@ struct Header {
   Header(const char *name, const char *value, int nameLength, int valueLength)
       : name(name), value(value), nameLength(nameLength),
         valueLength(valueLength) {}
+  // std::string_view must be null terminated
   Header(std::string_view name, std::string_view value)
-      : Header(name.data(), value.data(), static_cast<int>(name.length()),
-               static_cast<int>(value.length())) {}
+      : Header(name.data(), value.data(), static_cast<int>(name.length()) - 1,
+               static_cast<int>(value.length()) - 1) {}
   Header() = default;
   inline std::string_view Name() const {
     return std::string_view{name, static_cast<size_t>(nameLength)};
