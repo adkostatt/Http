@@ -12,7 +12,7 @@ TEST_CASE("Usual request with wrapper") {
   char *end = generator.Finalise();
   CHECK(end != nullptr);
   Parser parser(buffer, end);
-  int32_t data = parser.SetDelimeters();
+  int32_t data = parser.SetDelimiters();
   Request request;
 
   CHECK(parser.Recognise() == InputType::Request);

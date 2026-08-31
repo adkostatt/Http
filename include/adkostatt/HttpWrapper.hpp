@@ -75,7 +75,7 @@ public:
                           &header.value, &header.valueLength));
     return start;
   }
-  const int32_t SetDelimeters() {
+  const int32_t SetDelimiters() {
     const int32_t data = *reinterpret_cast<int32_t *>(end - 4);
     *reinterpret_cast<int32_t *>(end - 4) = Delimiters;
     return data;

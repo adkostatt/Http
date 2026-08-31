@@ -58,9 +58,11 @@ enum class HttpVersion {
   v2,
   v3
 };
-
+inline const char *SkipHeaders(const char *start, size_t size) {
+  return static_cast<const char *>(memmem(start, size, "\r\n\r\n", 4));
+}
 inline const char *SkipHeaders(const char *start, const char *end) {
-  return static_cast<const char *>(memmem(start, start - end, "\r\n\r\n", 4));
+  return SkipHeaders(start, end - start + 1);
 }
 // Array at the start must contain ':', ' ' and '\r' Or UB is possible
 const char *ParseHeader(const char *start, const char *end, const char **name,
